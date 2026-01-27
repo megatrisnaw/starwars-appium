@@ -2,6 +2,7 @@ from appium import webdriver
 from appium.options.android import UiAutomator2Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import time
 
 options = UiAutomator2Options()
@@ -23,40 +24,42 @@ wait = WebDriverWait(driver, 15)
 # EMAIL FIELD
 email_field = wait.until(
     EC.presence_of_element_located(
-        (
-            "xpath",
-            "//android.widget.EditText[@hint='E-mail address']"
-        )
+        ("xpath", "//android.widget.EditText[@hint='E-mail address']")
     )
 )
-email_field.click()
 email_field.clear()
 email_field.send_keys("user1@gmail.com")
 
 # PASSWORD FIELD
 password_field = wait.until(
     EC.presence_of_element_located(
-        (
-            "xpath",
-            "//android.widget.EditText[@hint='Password']"
-        )
+        ("xpath", "//android.widget.EditText[@hint='Password']")
     )
 )
-password_field.click()
 password_field.clear()
 password_field.send_keys("Mega2017.")
-
 
 # LOGIN BUTTON
 login_button = wait.until(
     EC.element_to_be_clickable(
-        (
-            "xpath",
-            "//android.view.ViewGroup[@content-desc='LOGIN']"
-        )
+        ("xpath", "//android.view.ViewGroup[@content-desc='LOGIN']")
     )
 )
 login_button.click()
-time.sleep(5)
 
-# driver.quit()  
+# ===== ASSERTION LOGIN =====
+try:
+    home_element = wait.until(
+        EC.presence_of_element_located(
+            ("xpath", "//android.view.ViewGroup[@content-desc='Joined Group']")
+        )
+    )
+
+    assert home_element.is_displayed()
+    print("PASS | LOGIN SUCCESS: Home screen displayed")
+
+except TimeoutException:
+    print("FAIL | LOGIN FAILED: Home screen not found")
+    raise
+    
+# driver.quit()
